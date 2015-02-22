@@ -1,11 +1,12 @@
-# History files
+# R-Studio stuff
+.Rproj.user
+*.Rproj
 .Rhistory
+.RData
 
-# Example code in package build process
-*-Ex.R
+# .Rmd output files except .md
+*.html
+*.pdf
 
-# R data files from past sessions
-.Rdata
-
-# RStudio files
-.Rproj.user/
+# data and generated image files
+data/*
