@@ -1,0 +1,188 @@
+---
+title: "DatSci-06 statInf Quiz Week 2"
+author: "Ronald Stalder"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    highlight: tango
+    keep_md: yes
+    theme: united
+---
+
+## Question 1
+
+```
+What is the variance of the distribution of the average an IID draw of n observations from a population with mean μ and variance σ2.
+
+σ/n
+σ2/n
+σ2
+2σ/√n
+```
+
+Population: $$ Var(X) = E[(X - \mu)^2] = E[X^2] - E[X]^2 = \sigma^2 $$  
+
+Sample: $$ S^2 = \frac{\sum_{i=1} (X_i - \bar X)^2}{n-1} $$  
+
+- the sample variance is expected to be the population variance  
+
+- answer Q1: **3: $\sigma^2$**  ## SHIT
+
+
+### second try
+
+- the sample *sd*, called *standard error* is $s = \frac{\sigma}{\sqrt n}$  
+- the sample variation = $s^2 = \frac{\sigma^2}{n}$  
+
+- answer Q1: **2: $\sigma^2 / n$**
+
+
+## Question 2
+
+```
+Suppose that diastolic blood pressures (DBPs) for men aged 35-44 are normally distributed with a mean of 80 (mm Hg) and a standard deviation of 10. About what is the probability that a random 35-44 year old has a DBP less than 70?
+
+16%
+8%
+22%
+32%
+```
+
+```{r q2}
+p <- pnorm(70, mean=80, sd=10, lower.tail = TRUE)
+
+print(paste0("Answer Q2: ", round(100*p), "%"))  ## 16%
+```
+
+## Question 3
+
+```
+Brain volume for adult women is normally distributed with a mean of about 1,100 cc for women with a standard deviation of 75 cc. What brain volume represents the 95th percentile?
+
+approximately 977
+approximately 1175
+approximately 1247
+approximately 1223
+```
+
+```{r q3}
+v <- qnorm(.95, mean=1100, sd=75)
+
+print(paste0("Answer Q3: ", round(v)))  ## 1223
+```
+
+## Question 4
+
+```
+Refer to the previous question. Brain volume for adult women is about 1,100 cc for women with a standard deviation of 75 cc. Consider the sample mean of 100 random adult women from this population. What is the 95th percentile of the distribution of that sample mean?
+
+approximately 1088 cc
+approximately 1112 cc
+approximately 1115 cc
+approximately 1110 cc
+```
+
+- see [Wikipedia](http://en.wikipedia.org/wiki/Sampling_distribution)  
+- the distribuition of the sample means is normal  
+    - with mean = population mean $\mu$  
+    - the *sd*, called *standard error* is $s = \frac{\sigma}{\sqrt n}$
+
+
+```{r q4}
+v <- qnorm(.95, mean=1100, sd=75/10)   # sd[pop] / sqrt(100)
+
+print(paste0("Answer Q4: ", round(v)))  ## 1112
+```
+
+## Question 5
+
+```
+You flip a fair coin 5 times, about what's the probability of getting 4 or 5 heads?
+
+12%
+3%
+6%
+19%
+```
+
+```{r q5}
+p <- pbinom(4, size=5, prob=0.5, lower.tail=FALSE)  # 4+ successes, 5 tries, fair coin
+
+print(paste0("Answer Q5: ", round(100*p), "%  SHIT"))  ## 3%  ## SHIT
+```
+
+
+### second try
+
+- see 06_CommonDistros.Rmd Binominal Trials / Choose
+
+```{r q5a, results='hold'}
+p1 <- pbinom(3, size = 5, prob = .5, lower.tail = FALSE)  # MORE THAN 3 HEADS
+p2 <- choose(5, 4) * .5 ^ 5 + choose(5, 5) * .5 ^ 5 
+round(p1,4) == round(p2,4)
+print(paste0("Answer Q5: ", round(100*p1), "%"))  ## 18%
+```
+
+## Question 6
+
+```
+The respiratory disturbance index (RDI), a measure of sleep disturbance, for a specific population has a mean of 15 (sleep events per hour) and a standard deviation of 10. They are not normally distributed. Give your best estimate of the probability that a sample mean RDI of 100 people is between 14 and 16 events per hour?
+
+47.5%
+68%
+95%
+34%
+```
+
+- sample means tend to be normally ditributed, even if population is not
+- sample mean = population mean = $\mu = 15$  
+- sample *sd* = *standard error* is $s = \frac{\sigma}{\sqrt n} = 10 / \sqrt 100 = 1$
+- p[14,16] = 1 - p[14-] - p[16+], or, because symmetric around mean: 1 - 2*p[14-]
+
+
+```{r q6}
+
+p <- 1 - 2 * pnorm(14, mean=15, sd=1, lower.tail=TRUE)
+
+print(paste0("Answer Q6: ", round(100*p,1), "%"))  ## 68.3% => 68%
+```
+
+## Question 7
+
+```
+Consider a standard uniform density. The mean for this density is .5 and the variance is 1 / 12. You sample 1,000 observations from this distribution and take the sample mean, what value would you expect it to be near?
+
+0.75
+0.25
+0.5
+0.10
+```
+
+- the sample mean is expected to be the population mean  
+
+- answer Q7: **3: 0.5**
+
+
+## Question 8
+
+```
+The number of people showing up at a bus stop is assumed to be Poisson with a mean of 5 people per hour. You watch the bus stop for 3 hours. About what's the probability of viewing 10 or fewer people?
+
+0.03
+0.08
+0.06
+0.12
+```
+
+* see *06_CommonDistros.Rmd line 221*   
+* $X \sim Poisson(\lambda t)$ where 
+  * $\lambda = E[X / t]$ is the expected count per unit of time
+  * $t$ is the total monitoring time
+
+
+```{r q8}
+lambda = 5 * 3   # 5 people per hour for 3 hours
+p <- ppois(10, lambda = lambda, lower.tail = TRUE)  # 10- people
+  
+print(paste0("Answer Q8: ", round(p,2)))  ## 0.12
+```

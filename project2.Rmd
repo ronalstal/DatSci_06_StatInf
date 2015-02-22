@@ -1,0 +1,117 @@
+---
+title: "Analyzing the 'ToothGrowth' Dataset"
+author: "Ronald Stalder"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    highlight: tango
+    theme: journal
+  pdf_document:
+    highlight: tango
+---
+
+#### Data Science - Statistical Inference - Course Project - Part 2
+
+```{r setup, echo=FALSE, results='hide'}
+library(data.table)
+library(ggplot2)
+```
+
+
+### Overview
+
+Blabla
+
+\pagebreak
+
+### Exploratory Analysis of the ToothGrowth data
+
+```{r exp-1}
+# get the dataset into a data.table
+X <- as.data.table(datasets::ToothGrowth)
+str(X)
+unique(X$dose)
+```
+In order to use the 'dose' as a grouping parameter, we need to transform it into a `factor`:
+```{r exp-2}
+X <- X[ ,dose:=as.factor(dose)]
+levels(X$dose) <- c("dose_0.5","dose_1.0","dose_2.0")
+summary(X)
+```
+Overview of the groups in the data:
+```{r exp-3, echo=FALSE}
+
+ggplot(X, aes(x=len,fill=supp))+
+  geom_histogram(binwidth=1.5)+
+  facet_grid(supp~dose,margins=T)
+
+ggplot(X, aes(x=1, y=len, fill=supp))+
+  geom_boxplot() + labs(y="teeth lenght")+
+  facet_grid(dose~supp, margins="dose", scales="free_y")+
+  theme(axis.text.x=element_blank(),axis.title.x=element_blank(), axis.ticks.x=element_blank())
+
+
+bxOJ <- cbind(X[supp=="OJ"&dose=="dose_0.5",len], X[supp=="OJ"&dose=="dose_1.0",len],
+              X[supp=="OJ"&dose=="dose_2.0",len], X[supp=="OJ",len])
+bxCV <- cbind(X[supp=="VC"&dose=="dose_0.5",len], X[supp=="VC"&dose=="dose_1.0",len],
+              X[supp=="VC"&dose=="dose_2.0",len], X[supp=="VC",len])
+bxAl <- cbind(X[dose=="dose_0.5",len], X[dose=="dose_1.0",len],
+              X[dose=="dose_2.0",len], X[ ,len])
+boxplot(bxOJ, at=0:3*4+1, xlim=c(0, 16), ylim=range(X$len), xaxt="n", col="orange",
+        ylab="teeth length", main="Tooth Growth for OJ, VC, both per Dose")
+boxplot(bxCV, at=0:3*4+2, xaxt="n", add=TRUE, col="turquoise")
+boxplot(bxAl, at=0:3*4+3, xaxt="n", add=TRUE, col="green")
+#boxplot(X$len, at=12, xaxt="n", add=TRUE, col="green")
+axis(1, at = 0:3*4 + 2, labels=c(levels(X$dose),"all"), tick=FALSE)
+text(c(7,8.25,9.8),7,labels=c("OJ","VC","both"),col=c("orange","turquoise","green"),font=2)
+#text(8,10,labels="OJ",col="orange")
+#text(8,10,labels="OJ",col="orange")
+
+txY = ceiling(1.05*max(X$len))
+ggplot(X, aes(x=0:4, y=len))+
+  labs(y="teeth lenght")+
+  facet_grid(.~dose, margins=TRUE)+
+  geom_boxplot(mapping=aes(x=1), data=X[supp=="OJ"], fill="orange")+
+  geom_boxplot(mapping=aes(x=2), data=X[supp=="VC"], fill="turquoise")+
+  geom_boxplot(mapping=aes(x=3), fill="green")+
+  geom_text(mapping=aes(x=1,y=txY), label="OJ", color="orange")+
+  geom_text(mapping=aes(x=2,y=txY), label="VC", color="turquoise")+
+  geom_text(mapping=aes(x=3,y=txY), label="all", color="green3")+
+  theme(axis.text.x=element_blank(),axis.title.x=element_blank(), axis.ticks.x=element_blank())
+
+```
+
+
+\pagebreak
+
+### Statistical significance of the dose
+
+\pagebreak
+
+### Statistical significance of the supplement
+
+\pagebreak
+
+### Conclusions
+
+
+\pagebreak
+
+### About This Document
+  
+The report was produced using `RStudio/knittr`  
+**on `r format(Sys.time(), "%F at %H:%M:%S (%Z, GMT%z)")`**  
+
+Numbers printed in the text part of this document are *not hardcoded*; they are the result of embedded R-code. The document can be generated with a different set of parameters without inconsistencies.
+
+The R-Markdown source file has been published [here on Github](https://github.com/ronasta/RepData_PeerAssessment2)  
+
+```{r sys-1, results='hold'}
+if (Sys.which("uname") != "") system("uname -srpi", intern=TRUE)
+if (Sys.which("lsb_release") != "") 
+    print(paste("Ubuntu:",system("lsb_release -rc", intern=TRUE)[1]))
+#print(paste("Rstudio version:", rstudio::versionInfo()$version))  # does not work in Rmd
+```
+```{r sys-2}
+sessionInfo()
+```
